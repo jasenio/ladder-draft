@@ -1983,7 +1983,7 @@ function App() {
                             </span>
                           )}
                         </div>
-                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'green' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
                           {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                           {(!finish && player.name !== 'BYE' && opponent.name !== 'BYE') && player[indx !== 1 ? 'score1' : 'score2'] === '' && (
                             <>{MatchScoreForm(player.ranking, indx !== 1 ? 'score1' : 'score2', player, opponent)}</>
@@ -2087,7 +2087,7 @@ function App() {
                             </span>
                           )}
                         </div>
-                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'green' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
                           {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                           {(!finish && player.name !== 'BYE' && opponent.name !== 'BYE') && player[indx !== 1 ? 'score1' : 'score2'] === '' && (
                             <>{MatchScoreForm(player.ranking, indx !== 1 ? 'score1' : 'score2', player, opponent)}</>
@@ -2191,7 +2191,7 @@ function App() {
                           </span>
                         )}
                       </div>
-                      <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'green' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                      <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
                         {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                         {(!finish && player.name !== 'BYE' && opponent.name !== 'BYE') && player[indx !== 1 ? 'score1' : 'score2'] === '' && (
                           <>{MatchScoreForm(player.ranking, indx !== 1 ? 'score1' : 'score2', player, opponent)}</>
@@ -2321,7 +2321,7 @@ function App() {
                             </span>
                           
                         </div>
-                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'green' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
                           {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                         </div>
                       </div>
@@ -2409,7 +2409,7 @@ function App() {
                             </span>
                           
                         </div>
-                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'green' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
                           {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                   
                         </div>
@@ -2499,7 +2499,7 @@ function App() {
                           </span>
                         
                       </div>
-                      <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'green' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                      <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
                         {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                         
                       </div>
