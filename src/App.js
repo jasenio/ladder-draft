@@ -1616,7 +1616,7 @@ function App() {
                     validationErrors.push(`Set ${index + 1} has invalid scores.3`);
                   }
                   // Check if either player has reached 7 points and wins by 2
-                  if (tieOne >= 7 || tieTwo >= 7) {
+                  if (tieOne > 7 || tieTwo > 7) {
                       if (scoreDifference !== 2) {
                         validationErrors.push(`Set ${index + 1} has invalid scores.4`);
                       }
@@ -1654,7 +1654,7 @@ function App() {
                     validationErrors.push(`Set ${index + 1} has invalid scores.`);
                   }
                   // Check if either player has reached 7 points and wins by 2
-                  if (tieOne >= 11 || tieTwo >= 11) {
+                  if (tieOne > 11 || tieTwo > 11) {
                       if (scoreDifference !== 2) {
                         validationErrors.push(`Set ${index + 1} has invalid scores.`);
                       }
