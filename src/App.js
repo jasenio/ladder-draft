@@ -555,7 +555,7 @@ function App() {
           const dir = player.movement === 'UP'? 1 : player.movement ==='STAY'? 2: player.movement ==='DOWN'? 3 : 0; 
           let dif = numPeople - currentRank +1;
           //Disperse bottom ten players
-          switch (ladder.length-rung+1) {
+          switch (ladder.length-rung) {
             case 3:
               switch (dir){
                 case 1:
