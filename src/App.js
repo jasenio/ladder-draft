@@ -1684,7 +1684,7 @@ function App() {
             else if(Math.abs(playerOneGames - playerTwoGames) < 2 ){
                 validationErrors.push(`Set ${index + 1} has invalid scores.`);
             }
-            else if((playerOneGames < 6 && playerTwoGames < 6) || playerOneGames > 7 || playerTwoGames > 7){
+            else if((playerOneGames < 6 && playerTwoGames < 6) || playerOneGames >= 7 || playerTwoGames >= 7){
                   validationErrors.push(`Set ${index + 1} has invalid scores.`);
             }
           }
