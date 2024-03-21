@@ -7,10 +7,6 @@ function App() {
   const [ladder, setLadder] = useState([]);
   const [history, setHistory] = useState([]);
   const [historyPage, setHistoryPage] = useState(0);
-  useEffect(()=>{
-    setSelectRank(-1);
-    console.log(ladder);
-  }, [ladder]);
 
   //Updates ladder
   const[finish, setFinish] = useState(false);
@@ -29,6 +25,23 @@ function App() {
       { playerOne: '', playerTwo: '' }
     ],
   });
+
+  useEffect(()=>{
+    setSelectRank(-1);
+    console.log(ladder);
+  }, [ladder]);
+  useEffect(()=>{
+    setScores({sets: [
+      { playerOne: '', playerTwo: '' },
+      { playerOne: '', playerTwo: '' },
+      { playerOne: '', playerTwo: '' }
+    ],
+    tiebreakers: [
+      { playerOne: '', playerTwo: '' },
+      { playerOne: '', playerTwo: '' },
+      { playerOne: '', playerTwo: '' }
+    ]});
+  }, [selectRank]);
 
   //Input refs
   const inputNameRef1 = useRef('');
@@ -485,7 +498,72 @@ function App() {
         const newPlayer = { ...ladder[rung][index] };
         newPlayer.score1 = '';
         newPlayer.score2 = '';
-        if(newPlayer.points===0 && newPlayer.name!=='BYE') newPlayer.cyclesSkipped++;
+        if(newPlayer.points===0 && newPlayer.name!=='BYE') {
+          newPlayer.cyclesSkipped++;
+          let numPeople = getNumPeople();
+          let moveRank = (rung*3);
+          moveRank += player.movement === 'UP'? 1 : player.movement ==='STAY'? 2: player.movement ==='DOWN'? 3 : 0; 
+
+          if(numPeople>=20 && ladder.length-rung <= 3){
+            const dir = player.movement === 'UP'? 1 : player.movement ==='STAY'? 2: player.movement ==='DOWN'? 3 : 0; 
+            //Disperse bottom ten players
+            switch (ladder.length-rung) {
+              case 3:
+                switch (dir){
+                  case 1:
+                    newPlayer.ranking = (rung-1)*3+3;
+                    newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                    break;
+                  case 2:
+                    newPlayer.ranking = (rung+1)*3+1;
+                    newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                    break;
+                  case 3:
+                    newPlayer.ranking = (rung+2)*3+1;
+                    newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                    break;
+                }
+                break; 
+              case 2:
+                switch (dir){
+                  case 1:
+                    newPlayer.ranking = (rung-1)*3+2;
+                    newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                    break;
+                  case 2:
+                    newPlayer.ranking = (rung)*3+2;
+                    newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                    break;
+                  case 3:
+                    newPlayer.ranking = (rung+1)*3+2;
+                    newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                    break;
+                }
+                break;
+              case 1:
+                switch (dir){
+                  case 1:
+                    newPlayer.ranking = (rung-2)*3+3;
+                    newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                    break;
+                  case 2:
+                    newPlayer.ranking = (rung-1)*3+3;
+                    newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                    break;
+                  case 3:
+                    newPlayer.ranking = (rung)*3+3;
+                    newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                    break;
+                }
+                break;
+              default:
+   
+            }
+          }
+        }
+        else{
+          newPlayer.cyclesSkipped=0;
+        }
         console.log(newPlayer);
         console.log(rung);
         console.log(index);
@@ -759,30 +837,40 @@ function App() {
       fontSize: '1.2em',  // Set the font size to make it larger
       color: 'black',     // Adjust the color as needed
     };
+    const tieBoldStyle = {
+      fontWeight: 'bold', // Make the bold numbers more pronounced
+      fontSize: '.8em',  // Set the font size to make it larger
+      color: 'black',     // Adjust the color as needed
+    };
     if(isNaN(parseInt(score[0]))){
       return <span>{score}</span>
     }
-  
+    
     return score.split(' ').map((set, index) => {
       const match = set.match(/(\d+)-(\d+)(?:\((\d+)-(\d+)\))?/);
       
       if (match) {
         const [, first, second, tbFirst, tbSecond] = match;
+        if(score==="6-4 1-6 1-0(11-9)") {console.log(match);
+        console.log(tbFirst);
+        console.log(tbSecond);
+        console.log(Number(tbFirst) < Number(tbSecond));
+      }
         const mainScore = (
           <>
-            <span style={first > second ? boldStyle : {}}>{first}</span>
+            <span style={Number(first) > Number(second) ? boldStyle :  {fontSize: '.9em', color: 'darkgray'}}>{first}</span>
             <span>-</span>
-            <span style={first < second ? boldStyle : {}}>{second}</span>
+            <span style={Number(first) < Number(second) ? boldStyle :  {fontSize: '.9em', color: 'darkgray'}}>{second}</span>
           </>
         );
   
         const tbScore = tbFirst && tbSecond ? (
           <>
-            <span>({}</span>
-            <span style={tbFirst > tbSecond ? boldStyle : {}}>{tbFirst}</span>
+            <span style = {{fontSize: '.6em'}}>(</span>
+            <span style={Number(tbFirst) > Number(tbSecond) ? tieBoldStyle : {fontSize: '.6em', color: 'darkgray'}}>{tbFirst}</span>
             <span>-</span>
-            <span style={tbFirst < tbSecond ? boldStyle : {}}>{tbSecond}</span>
-            <span>)</span>
+            <span style={Number(tbFirst) < Number(tbSecond) ? tieBoldStyle :  {fontSize: '.6em', color: 'darkgray'}}>{tbSecond}</span>
+            <span style = {{fontSize: '.6em'}} >)</span>
           </>
         ) : null;
   
@@ -791,7 +879,9 @@ function App() {
             {tbScore ? (
               <>
                 {mainScore}
-                {tbScore}
+                <sup style={{ position: 'relative', top: '-0.5em', left: '0.2em' }}>
+                  {tbScore}
+                </sup>
               </>
             ) : mainScore}
             {index < score.split(' ').length - 1 && ' '} {/* Add space between sets */}
@@ -958,8 +1048,8 @@ function App() {
     const updatedPlayer = createPlayer(
       e.target.elements.name.value === '' ? newRung[pos-1].name : e.target.elements.name.value  ,
       e.target.elements.rank.value, 
-      e.target.elements.score1.value === '' ? newRung[pos-1].score1 : e.target.elements.score1.value,
-      e.target.elements.score2.value === '' ? newRung[pos-1].score2 : e.target.elements.score2.value,
+      e.target.elements.score1.value === '' ? newRung[pos-1].score1 : e.target.elements.score1.value === 'clear'? '' : e.target.elements.score1.value,
+      e.target.elements.score2.value === '' ? newRung[pos-1].score2 : e.target.elements.score2.value === 'clear'? '' :e.target.elements.score2.value,
     );
     console.log(e.target.elements.name.value);
     console.log(e.target.elements.rank.value);
@@ -1017,6 +1107,7 @@ function App() {
       '',
     );
     shiftDown(updatedPlayer, getNumPeople()+1);
+    alert(`Added ${e.target.elements.name.value} at bottom of ladder`);
   };
 
   //Inserts a single player
@@ -1040,6 +1131,7 @@ function App() {
     );
 
     shiftDown(updatedPlayer, rank);
+    alert(`Inserted ${e.target.elements.name} at ${e.target.elements.rank.value} rank`);
   };
 
   //Inserts a single player
@@ -1143,10 +1235,10 @@ function App() {
                 } else if (random2points === 11 && random1points ===10) {
                   setScores += `${0}-${1}(${random1points}-${random2points}) `;
                   p1points = random1points;
-                  p2points = random2points;
+                  p2points = random2points+1;
                 } else if (random1points === 11 && random2points ===10) {
                   setScores += `${1}-${0}(${random1points+1}-${random2points}) `;
-                  p1points = random1points;
+                  p1points = random1points+1;
                   p2points = random2points;
                 } else if (random2points ===11 && random1points === 10) {
                     setScores += `${0}-${1}(${random1points}-${random2points+1}) `;
@@ -1370,6 +1462,7 @@ function App() {
       }
     }
     setLadder(updatedLadder);
+    alert("Filled every empty score with a random match");
   }
 
   //Reports the score for empty matches
@@ -1665,22 +1758,25 @@ function App() {
           <button onClick = {()=>setSelectRank(-1)}>CANCEL</button>
           <form className="match-form" onSubmit={handleSubmit}>
             <div className="sets-container">
-            {scores.sets.map((set, index) => (
+            {scores.sets.map((set, index) => {
+              if(index <= 1 || !((Number(scores.sets[0].playerOne) > Number(scores.sets[0].playerTwo) && Number(scores.sets[1].playerOne) > Number(scores.sets[1].playerTwo)) || (Number(scores.sets[0].playerOne) < Number(scores.sets[0].playerTwo) && Number(scores.sets[1].playerOne) < Number(scores.sets[1].playerTwo))))
+              return(
               <div className ="set-all">
               <label>
-                  {`Set ${index+1}`}
+                  {`SET ${index+1}`}{((index===2 && (String(set.playerOne) === '1' && String(set.playerTwo) === '0') || (String(set.playerOne) === '0' && String(set.playerTwo) === '1')) 
+                  || ((String(set.playerOne) === '6' && String(set.playerTwo) === '7') || (String(set.playerOne) === '7' && String(set.playerTwo) === '6'))) && <span>: TIEBREAK</span>}
               </label>
               <div key={index} className="set-container">
                 <div className="set-score">
                   <div>
-                    <input
+                    <input style = {{border: set.playerOne > set.playerTwo && "solid 3px darkgray"}}
                       type="number"
                       value={set.playerOne}
                       onChange={(e) => handleChange(e, index, 'playerOne')}
                     />
                   </div>
                   <div>
-                    <input
+                    <input style = {{border: set.playerOne < set.playerTwo && "solid 3px darkgray"}}
                       type="number"
                       value={set.playerTwo}
                       onChange={(e) => handleChange(e, index, 'playerTwo')}
@@ -1692,14 +1788,14 @@ function App() {
                 && (
                   <div className="tiebreak-score">
                     <div>
-                      <input
+                      <input style = {{border: set.playerOne > set.playerTwo && "solid 3px darkgray"}}
                         type="number"
                         value={scores.tiebreakers[index].playerOne}
                         onChange={(e) => handleChange(e, 3 + index, 'playerOne')}
                       />
                     </div>
                     <div>
-                      <input
+                      <input style = {{border: set.playerOne < set.playerTwo && "solid 3px darkgray"}}
                         type="number"
                         value={scores.tiebreakers[index].playerTwo}
                         onChange={(e) => handleChange(e, 3 + index, 'playerTwo')}
@@ -1709,7 +1805,8 @@ function App() {
                 )}
               </div>
               </div>
-            ))}
+              );
+             })}
           </div>
           <div className = "match-result">
             <label>
@@ -1747,6 +1844,9 @@ function App() {
         </>
     );
   }
+
+  //Report a winner for the score
+  
 
   return (
     <div className="Container">
@@ -1842,6 +1942,7 @@ function App() {
             {!finish && <div className="EditPlayer">
               <h1>EDIT PLAYER</h1>
               <form onSubmit={editPlayer}>
+
                 <div>
                 <label>Ranking:</label>
                 <input
@@ -1856,19 +1957,19 @@ function App() {
                   name="name"
                 />
                 </div>
-                <div>
-                  <label>Score 1:</label>
+                <div style = {{display: 'none'}}>
+                  <label>Ranking:</label>
                   <input
                     type="text"
                     name="score1"
                   />
                 </div>
-                <div>
-                  <label>Score 2:</label>
-                  <input
-                    type="text"
-                    name="score2"
-                  />
+                <div style = {{display: 'none'}}>
+                <label>Ranking:</label>
+                <input
+                  type="text"
+                  name="score2"
+                />
                 </div>
                 <button type="submit">Submit</button>
               </form>
@@ -1979,7 +2080,7 @@ function App() {
                     return (
                       <div className="Match" key={indx}>
                         <div className="Players">
-                          <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal' }}>
+                          <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal', color: !played? 'black' : matchResult ? 'black' : 'darkgray'}}>
                             {`${player.ranking} ${player.name} `}
                           </span>
                           {player.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
@@ -1987,11 +2088,14 @@ function App() {
                           </span>}
                           {finish && (
                             <span style={{ color: movementColor }}>
-                              {arrowIcon}
+                              {arrowIcon}{' '} 
                             </span>
                           )}
-                          <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal' }}>
-                            {`      |      ${opponent.ranking} ${opponent.name} `}
+                          <span>
+                             | 
+                          </span>
+                          <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal', color: !played? 'black' : !matchResult ? 'black' : 'darkgray' }}>
+                            {` ${opponent.ranking} ${opponent.name} `}
                           </span>
                           {opponent.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
                             {`(DROP WARNINGS: ${opponent.cyclesSkipped})`}
@@ -2002,10 +2106,26 @@ function App() {
                             </span>
                           )}
                         </div>
-                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? 'darkgray' : 'gray' }}>
                           {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                           {(!finish && player.name !== 'BYE' && opponent.name !== 'BYE') && player[indx !== 1 ? 'score1' : 'score2'] === '' && (
                             <>{MatchScoreForm(player.ranking, indx !== 1 ? 'score1' : 'score2', player, opponent)}</>
+                          )}
+                          {!finish && !((!finish && player.name !== 'BYE' && opponent.name !== 'BYE') && player[indx !== 1 ? 'score1' : 'score2'] === '') && (
+                            <button onClick={() => {
+                              const e = {
+                                preventDefault: () => {}, // Define preventDefault function
+                                target: {
+                                  elements: {
+                                    rank: {value: player.ranking},
+                                    name: {value: ''},
+                                    score1: {value: 'clear'},
+                                    score2: {value: ''}
+                                  }
+                                }
+                              };
+                              editPlayer(e); // Call removePlayer with the synthetic event object
+                            }}>CLEAR SCORES</button>
                           )}
                         </div>
                         {(!finish && player.name!=='BYE') && <div className = "REMOVE">
@@ -2083,7 +2203,7 @@ function App() {
                     return (
                       <div className="Match" key={indx}>
                         <div className="Players">
-                          <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal' }}>
+                          <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal', color: !played? 'black' : matchResult ? 'black' : 'darkgray'  }}>
                             {`${player.ranking} ${player.name} `}
                           </span>
                           {player.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
@@ -2091,11 +2211,14 @@ function App() {
                           </span>}
                           {finish && (
                             <span style={{ color: movementColor }}>
-                              {arrowIcon}
+                              {arrowIcon}{' '}
                             </span>
                           )}
-                          <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal' }}>
-                            {`      |      ${opponent.ranking} ${opponent.name} `}
+                          <span>
+                             | 
+                          </span>
+                          <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal', color: !played? 'black' : !matchResult ? 'black' : 'darkgray'  }}>
+                            {` ${opponent.ranking} ${opponent.name} `}
                           </span>
                           {opponent.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
                             {`(DROP WARNINGS: ${opponent.cyclesSkipped})`}
@@ -2106,10 +2229,26 @@ function App() {
                             </span>
                           )}
                         </div>
-                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? 'darkgray' : 'gray' }}>
                           {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                           {(!finish && player.name !== 'BYE' && opponent.name !== 'BYE') && player[indx !== 1 ? 'score1' : 'score2'] === '' && (
                             <>{MatchScoreForm(player.ranking, indx !== 1 ? 'score1' : 'score2', player, opponent)}</>
+                          )}
+                          {!finish && !((!finish && player.name !== 'BYE' && opponent.name !== 'BYE') && player[indx !== 1 ? 'score1' : 'score2'] === '') && (
+                            <button onClick={() => {
+                              const e = {
+                                preventDefault: () => {}, // Define preventDefault function
+                                target: {
+                                  elements: {
+                                    rank: {value: player.ranking},
+                                    name: {value: ''},
+                                    score1: {value: ''},
+                                    score2: {value: 'clear'}
+                                  }
+                                }
+                              };
+                              editPlayer(e); // Call removePlayer with the synthetic event object
+                            }}>CLEAR SCORES</button>
                           )}
                         </div>
                         {(!finish && player.name!=='BYE') && <div className = "REMOVE">
@@ -2187,7 +2326,7 @@ function App() {
                   return (
                     <div className="Match" key={indx}>
                       <div className="Players">
-                        <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal' }}>
+                        <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal', color: !played? 'black' : matchResult ? 'black' : 'darkgray'  }}>
                           {`${player.ranking} ${player.name} `}
                         </span>
                         {player.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
@@ -2195,11 +2334,14 @@ function App() {
                         </span>}
                         {finish && (
                           <span style={{ color: movementColor }}>
-                            {arrowIcon}
+                            {arrowIcon}{' '}
                           </span>
                         )}
-                        <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal' }}>
-                          {`      |      ${opponent.ranking} ${opponent.name} `}
+                        <span>
+                             | 
+                          </span>
+                        <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal', color: !played? 'black' : !matchResult ? 'black' : 'darkgray'  }}>
+                          {` ${opponent.ranking} ${opponent.name} `}
                         </span>
                         {opponent.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
                           {`(DROP WARNINGS: ${opponent.cyclesSkipped})`}
@@ -2210,11 +2352,27 @@ function App() {
                           </span>
                         )}
                       </div>
-                      <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                      <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? 'darkgray' : 'gray' }}>
                         {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                         {(!finish && player.name !== 'BYE' && opponent.name !== 'BYE') && player[indx !== 1 ? 'score1' : 'score2'] === '' && (
                           <>{MatchScoreForm(player.ranking, indx !== 1 ? 'score1' : 'score2', player, opponent)}</>
                         )}
+                        {!finish && !((!finish && player.name !== 'BYE' && opponent.name !== 'BYE') && player[indx !== 1 ? 'score1' : 'score2'] === '') && (
+                            <button onClick={() => {
+                              const e = {
+                                preventDefault: () => {}, // Define preventDefault function
+                                target: {
+                                  elements: {
+                                    rank: {value: player.ranking},
+                                    name: {value: ''},
+                                    score1: {value: 'clear'},
+                                    score2: {value: ''}
+                                  }
+                                }
+                              };
+                              editPlayer(e); // Call removePlayer with the synthetic event object
+                            }}>CLEAR SCORES</button>
+                          )}
                       </div>
                       {(!finish && player.name!=='BYE') && <div className = "REMOVE">
                       <button onClick={() => {
@@ -2267,7 +2425,7 @@ function App() {
                 if(getNumPeople() >=10 && index <=2) return (<div className="Set" key={index}>
                   <p>Rung {index + 1}
                     {(getNumPeople() >=10 && index <=2)&& <span> - Top 10 Bracket</span>}
-                    {(getNumPeople() >=20 &&ladder.length-index<= 3) && <span> - Bottom 10 Bracket</span>}
+                    {(getNumPeople() >=20 && history[historyPage].length-index<= 3) && <span> - Bottom 10 Bracket</span>}
                   </p>
                   {set.map((player, indx) => {
                     const matchResult = getMatchResult(indx !== 1 ? player.score1 : player.score2);
@@ -2317,7 +2475,7 @@ function App() {
                     return (
                       <div className="Match" key={indx}>
                         <div className="Players">
-                          <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal' }}>
+                          <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal', color: !played? 'black' : matchResult ? 'black' : 'darkgray'  }}>
                             {`${player.ranking} ${player.name} `}
                           </span>
                           {player.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
@@ -2325,11 +2483,13 @@ function App() {
                           </span>}
 
                             <span style={{ color: movementColor }}>
-                              {arrowIcon}
+                              {arrowIcon}{' '}
                             </span>
-                          
-                          <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal' }}>
-                            {`      |      ${opponent.ranking} ${opponent.name} `}
+                            <span>
+                             | 
+                          </span>
+                          <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal', color: !played? 'black' : !matchResult ? 'black' : 'darkgray'  }}>
+                            {` ${opponent.ranking} ${opponent.name} `}
                           </span>
                           {opponent.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
                             {`(DROP WARNINGS: ${opponent.cyclesSkipped})`}
@@ -2340,7 +2500,7 @@ function App() {
                             </span>
                           
                         </div>
-                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? 'darkgray' : 'gray' }}>
                           {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                         </div>
                       </div>
@@ -2352,10 +2512,10 @@ function App() {
           <div className = "MainDraw">
             <h1>MAIN DRAW</h1>
             {history[historyPage].map((set, index) => {
-                if(!(getNumPeople() >=10 && index <=2)&&!(getNumPeople() >=20 && ladder.length-index <= 3)) return (<div className="Set" key={index}>
+                if(!(getNumPeople() >=10 && index <=2)&&!(getNumPeople() >=20 && history[historyPage].length-index <= 3)) return (<div className="Set" key={index}>
                   <p>Rung {index + 1}
                     {(getNumPeople() >=10 && index <=2)&& <span> - Top 10 Bracket</span>}
-                    {(getNumPeople() >=20 && ladder.length-index<= 3) && <span> - Bottom 10 Bracket</span>}
+                    {(getNumPeople() >=20 && history[historyPage].length-index<= 3) && <span> - Bottom 10 Bracket</span>}
                   </p>
                   {set.map((player, indx) => {
                     const matchResult = getMatchResult(indx !== 1 ? player.score1 : player.score2);
@@ -2405,7 +2565,7 @@ function App() {
                     return (
                       <div className="Match" key={indx}>
                         <div className="Players">
-                          <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal' }}>
+                          <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal', color: !played? 'black' : matchResult ? 'black' : 'darkgray'  }}>
                             {`${player.ranking} ${player.name} `}
                           </span>
                           {player.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
@@ -2413,11 +2573,13 @@ function App() {
                           </span>}
                   
                             <span style={{ color: movementColor }}>
-                              {arrowIcon}
+                              {arrowIcon}{' '}
                             </span>
-                          
-                          <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal' }}>
-                            {`      |      ${opponent.ranking} ${opponent.name} `}
+                            <span>
+                             | 
+                          </span>
+                          <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal', color: !played? 'black' : !matchResult ? 'black' : 'darkgray'  }}>
+                            {` ${opponent.ranking} ${opponent.name} `}
                           </span>
                           {opponent.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
                             {`(DROP WARNINGS: ${opponent.cyclesSkipped})`}
@@ -2428,7 +2590,7 @@ function App() {
                             </span>
                           
                         </div>
-                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                        <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? 'darkgray' : 'gray' }}>
                           {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                   
                         </div>
@@ -2442,10 +2604,10 @@ function App() {
           <div className = "BottomTen">
           {true && <h1>BOTTOM 10</h1>}
           {history[historyPage].map((set, index) => {
-              if(getNumPeople() >=20 && ladder.length-index <= 3) return (<div className="Set" key={index}>
+              if(getNumPeople() >=20 && history[historyPage].length-index <= 3) return (<div className="Set" key={index}>
                 <p>Rung {index + 1}
                   {(getNumPeople() >=10 && index <=2)&& <span> - Top 10 Bracket</span>}
-                  {(getNumPeople() >=20 && ladder.length-index <= 3)&& <span> - Bottom 10 Bracket</span>}
+                  {(getNumPeople() >=20 && history[historyPage].length-index <= 3)&& <span> - Bottom 10 Bracket</span>}
                 </p>
                 {set.map((player, indx) => {
                   const matchResult = getMatchResult(indx !== 1 ? player.score1 : player.score2);
@@ -2495,7 +2657,7 @@ function App() {
                   return (
                     <div className="Match" key={indx}>
                       <div className="Players">
-                        <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal' }}>
+                        <span style={{ fontWeight: !played? 'normal' : matchResult ? 'bold' : 'normal', color: !played? 'black' : matchResult ? 'black' : 'darkgray'  }}>
                           {`${player.ranking} ${player.name} `}
                         </span>
                         {player.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
@@ -2503,11 +2665,13 @@ function App() {
                         </span>}
 
                           <span style={{ color: movementColor }}>
-                            {arrowIcon}
+                            {arrowIcon}{' '}
                           </span>
-                        
-                        <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal' }}>
-                          {`      |      ${opponent.ranking} ${opponent.name} `}
+                          <span>
+                             | 
+                          </span>
+                        <span style={{ fontWeight: !played? 'normal' : !matchResult ? 'bold' : 'normal' , color: !played? 'black' : !matchResult ? 'black' : 'darkgray' }}>
+                          {` ${opponent.ranking} ${opponent.name} `}
                         </span>
                         {opponent.cyclesSkipped > 0 && <span style = {{color: 'red'}}>
                           {`(DROP WARNINGS: ${opponent.cyclesSkipped})`}
@@ -2518,7 +2682,7 @@ function App() {
                           </span>
                         
                       </div>
-                      <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? '#FFA500' : 'gray' }}>
+                      <div className="Score" style = {{color: (player[indx !== 1 ? 'score1' : 'score2'] === '') ? 'gray' : (isNaN(parseInt(player[indx !== 1 ? 'score1' : 'score2'][0]))) ? 'darkgray' : 'gray' }}>
                         {player[indx !== 1 ? 'score1' : 'score2'] === '' ? 'N/A' : BoldScore(player[indx !== 1 ? 'score1' : 'score2'])}
                         
                       </div>
