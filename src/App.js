@@ -486,13 +486,15 @@ function App() {
         newPlayer.score1 = '';
         newPlayer.score2 = '';
         if(newPlayer.points===0 && newPlayer.name!=='BYE') newPlayer.cyclesSkipped++;
-
+        console.log(newPlayer);
+        console.log(rung);
+        console.log(index);
         let currentRank = (rung*3)+index+1;
         let numPeople = getNumPeople();
 
         let moveRank = (rung*3);
         moveRank += player.movement === 'UP'? 1 : player.movement ==='STAY'? 2: player.movement ==='DOWN'? 3 : 0; 
-      
+        console.log(moveRank);
         //Conditional for top 10
         if(numPeople>=10 && moveRank <= 8){
           currentRank = (rung*3);
@@ -548,42 +550,59 @@ function App() {
           console.log('');
         }
         //Condition for bottom 10
-        else if(numPeople>=20 && numPeople-moveRank+1 <= 8){
+        else if(numPeople>=20 && ladder.length-rung <= 3){
           currentRank = (rung*3);
-          currentRank += player.movement === 'UP'? 1 : player.movement ==='STAY'? 2: player.movement ==='DOWN'? 3 : 0; 
+          const dir = player.movement === 'UP'? 1 : player.movement ==='STAY'? 2: player.movement ==='DOWN'? 3 : 0; 
           let dif = numPeople - currentRank +1;
-          switch (dif) {
-            case 1:
-              newPlayer.ranking = currentRank;
-              newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
-              break;
-            case 2:
-              newPlayer.ranking = currentRank-2;
-              newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
-              break;
+          //Disperse bottom ten players
+          switch (ladder.length-rung+1) {
             case 3:
-              newPlayer.ranking = currentRank-4;
-              newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+              switch (dir){
+                case 1:
+                  newPlayer.ranking = (rung-1)*3+3;
+                  newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                  break;
+                case 2:
+                  newPlayer.ranking = (rung+1)*3+1;
+                  newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                  break;
+                case 3:
+                  newPlayer.ranking = (rung+2)*3+1;
+                  newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                  break;
+              }
+              break; 
+            case 2:
+              switch (dir){
+                case 1:
+                  newPlayer.ranking = (rung-1)*3+2;
+                  newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                  break;
+                case 2:
+                  newPlayer.ranking = (rung)*3+2;
+                  newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                  break;
+                case 3:
+                  newPlayer.ranking = (rung+1)*3+2;
+                  newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                  break;
+              }
               break;
-            case 4:
-              newPlayer.ranking = currentRank+2;
-              newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
-              break;
-            case 5:
-              newPlayer.ranking = currentRank;
-              newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
-              break;
-            case 6:
-              newPlayer.ranking = currentRank-2;
-              newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
-              break;
-            case 7:
-              newPlayer.ranking = currentRank+4;
-              newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
-              break;
-            case 8:
-              newPlayer.ranking = currentRank +2;
-              newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+            case 1:
+              switch (dir){
+                case 1:
+                  newPlayer.ranking = (rung-2)*3+3;
+                  newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                  break;
+                case 2:
+                  newPlayer.ranking = (rung-1)*3+3;
+                  newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                  break;
+                case 3:
+                  newPlayer.ranking = (rung)*3+3;
+                  newLadder[Math.floor((newPlayer.ranking-1)/3)][((newPlayer.ranking-1) % 3)] = newPlayer;
+                  break;
+              }
               break;
             default:
  
@@ -1910,7 +1929,7 @@ function App() {
                 if(getNumPeople() >=10 && index <=2) return (<div className="Set" key={index}>
                   <p>Rung {index + 1}
                     {(getNumPeople() >=10 && index <=2)&& <span> - Top 10 Bracket</span>}
-                    {(getNumPeople() >=20 && (Math.ceil(getNumPeople()/3)-index -1<=2 + (Math.ceil((getNumPeople() % 3)/3))))&& <span> - Bottom 10 Bracket</span>}
+                    {(getNumPeople() >=20 && ladder.length-index <= 3)&& <span> - Bottom 10 Bracket</span>}
                   </p>
                   {set.map((player, indx) => {
                     const matchResult = getMatchResult(indx !== 1 ? player.score1 : player.score2);
@@ -2011,10 +2030,10 @@ function App() {
           <div className = "MainDraw">
             <h1>MAIN DRAW</h1>
             {ladder.map((set, index) => {
-                if(!(getNumPeople() >=10 && index <=2)&&!(getNumPeople() >=20 && (Math.ceil(getNumPeople()/3)-index -1<=2 + (Math.ceil((getNumPeople() % 3)/3))))) return (<div className="Set" key={index}>
+                if(!(getNumPeople() >=10 && index <=2)&&!(getNumPeople() >=20 && ladder.length-index<= 3)) return (<div className="Set" key={index}>
                   <p>Rung {index + 1}
                     {(getNumPeople() >=10 && index <=2)&& <span> - Top 10 Bracket</span>}
-                    {(getNumPeople() >=20 && (Math.ceil(getNumPeople()/3)-index -1<=2 + (Math.ceil((getNumPeople() % 3)/3))))&& <span> - Bottom 10 Bracket</span>}
+                    {(getNumPeople() >=20 && ladder.length-index <= 3) && <span> - Bottom 10 Bracket</span>}
                   </p>
                   {set.map((player, indx) => {
                     const matchResult = getMatchResult(indx !== 1 ? player.score1 : player.score2);
@@ -2115,10 +2134,10 @@ function App() {
           <div className = "BottomTen">
           {true && <h1>BOTTOM 10</h1>}
           {ladder.map((set, index) => {
-              if(getNumPeople() >=20 && (Math.ceil(getNumPeople()/3)-index -1<=2 + (Math.ceil((getNumPeople() % 3)/3)))) return (<div className="Set" key={index}>
+              if(getNumPeople() >=20 && ladder.length-index <= 3) return (<div className="Set" key={index}>
                 <p>Rung {index + 1}
                   {(getNumPeople() >=10 && index <=2)&& <span> - Top 10 Bracket</span>}
-                  {(getNumPeople() >=20 && (Math.ceil(getNumPeople()/3)-index -1<=2 + (Math.ceil((getNumPeople() % 3)/3))))&& <span> - Bottom 10 Bracket</span>}
+                  {(getNumPeople() >=20 && ladder.length-index <= 3) && <span> - Bottom 10 Bracket</span>}
                 </p>
                 {set.map((player, indx) => {
                   const matchResult = getMatchResult(indx !== 1 ? player.score1 : player.score2);
@@ -2248,7 +2267,7 @@ function App() {
                 if(getNumPeople() >=10 && index <=2) return (<div className="Set" key={index}>
                   <p>Rung {index + 1}
                     {(getNumPeople() >=10 && index <=2)&& <span> - Top 10 Bracket</span>}
-                    {(getNumPeople() >=20 && (Math.ceil(getNumPeople()/3)-index -1<=2 + (Math.ceil((getNumPeople() % 3)/3))))&& <span> - Bottom 10 Bracket</span>}
+                    {(getNumPeople() >=20 &&ladder.length-index<= 3) && <span> - Bottom 10 Bracket</span>}
                   </p>
                   {set.map((player, indx) => {
                     const matchResult = getMatchResult(indx !== 1 ? player.score1 : player.score2);
@@ -2333,10 +2352,10 @@ function App() {
           <div className = "MainDraw">
             <h1>MAIN DRAW</h1>
             {history[historyPage].map((set, index) => {
-                if(!(getNumPeople() >=10 && index <=2)&&!(getNumPeople() >=20 && (Math.ceil(getNumPeople()/3)-index -1<=2 + (Math.ceil((getNumPeople() % 3)/3))))) return (<div className="Set" key={index}>
+                if(!(getNumPeople() >=10 && index <=2)&&!(getNumPeople() >=20 && ladder.length-index <= 3)) return (<div className="Set" key={index}>
                   <p>Rung {index + 1}
                     {(getNumPeople() >=10 && index <=2)&& <span> - Top 10 Bracket</span>}
-                    {(getNumPeople() >=20 && (Math.ceil(getNumPeople()/3)-index -1<=2 + (Math.ceil((getNumPeople() % 3)/3))))&& <span> - Bottom 10 Bracket</span>}
+                    {(getNumPeople() >=20 && ladder.length-index<= 3) && <span> - Bottom 10 Bracket</span>}
                   </p>
                   {set.map((player, indx) => {
                     const matchResult = getMatchResult(indx !== 1 ? player.score1 : player.score2);
@@ -2423,10 +2442,10 @@ function App() {
           <div className = "BottomTen">
           {true && <h1>BOTTOM 10</h1>}
           {history[historyPage].map((set, index) => {
-              if(getNumPeople() >=20 && (Math.ceil(getNumPeople()/3)-index -1<=2 + (Math.ceil((getNumPeople() % 3)/3)))) return (<div className="Set" key={index}>
+              if(getNumPeople() >=20 && ladder.length-index <= 3) return (<div className="Set" key={index}>
                 <p>Rung {index + 1}
                   {(getNumPeople() >=10 && index <=2)&& <span> - Top 10 Bracket</span>}
-                  {(getNumPeople() >=20 && (Math.ceil(getNumPeople()/3)-index -1<=2 + (Math.ceil((getNumPeople() % 3)/3))))&& <span> - Bottom 10 Bracket</span>}
+                  {(getNumPeople() >=20 && ladder.length-index <= 3)&& <span> - Bottom 10 Bracket</span>}
                 </p>
                 {set.map((player, indx) => {
                   const matchResult = getMatchResult(indx !== 1 ? player.score1 : player.score2);
