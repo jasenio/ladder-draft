@@ -2119,11 +2119,13 @@ function App() {
                                   elements: {
                                     rank: {value: player.ranking},
                                     name: {value: ''},
-                                    score1: {value: 'clear'},
-                                    score2: {value: ''}
+                                    score1: {value: indx !== 1 ? 'clear' : ''},
+                                    score2: {value: indx === 1 ? 'clear' : ''}
                                   }
                                 }
                               };
+                              console.log(player);
+                              console.log(e);
                               editPlayer(e); // Call removePlayer with the synthetic event object
                             }}>CLEAR SCORES</button>
                           )}
@@ -2242,8 +2244,8 @@ function App() {
                                   elements: {
                                     rank: {value: player.ranking},
                                     name: {value: ''},
-                                    score1: {value: ''},
-                                    score2: {value: 'clear'}
+                                    score1: {value: indx !== 1 ? 'clear' : ''},
+                                    score2: {value: indx === 1 ? 'clear' : ''}
                                   }
                                 }
                               };
@@ -2365,8 +2367,8 @@ function App() {
                                   elements: {
                                     rank: {value: player.ranking},
                                     name: {value: ''},
-                                    score1: {value: 'clear'},
-                                    score2: {value: ''}
+                                    score1: {value: indx !== 1 ? 'clear' : ''},
+                                    score2: {value: indx === 1 ? 'clear' : ''}
                                   }
                                 }
                               };
