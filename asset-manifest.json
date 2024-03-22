@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/ladder-draft/static/css/main.7d528a2b.css",
-    "main.js": "/ladder-draft/static/js/main.60dbab8f.js",
+    "main.js": "/ladder-draft/static/js/main.e7035585.js",
     "index.html": "/ladder-draft/index.html",
     "main.7d528a2b.css.map": "/ladder-draft/static/css/main.7d528a2b.css.map",
-    "main.60dbab8f.js.map": "/ladder-draft/static/js/main.60dbab8f.js.map"
+    "main.e7035585.js.map": "/ladder-draft/static/js/main.e7035585.js.map"
   },
   "entrypoints": [
     "static/css/main.7d528a2b.css",
-    "static/js/main.60dbab8f.js"
+    "static/js/main.e7035585.js"
   ]
 }
